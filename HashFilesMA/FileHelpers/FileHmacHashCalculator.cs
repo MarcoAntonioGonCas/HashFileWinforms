@@ -96,9 +96,9 @@ namespace HashFilesMA.FileHelpers
 
                 return hashHex;
             }
-            catch
+            catch(Exception ex)
             {
-                OnError(new EventArgs());
+                OnError(new ErrorHashFileArgs() { Mensaje = ex.Message });
                 return "";
             }
         }
@@ -133,7 +133,7 @@ namespace HashFilesMA.FileHelpers
 
 
             }catch(Exception ex) {
-                OnError(new EventArgs());
+                OnError(new ErrorHashFileArgs() { Mensaje = ex.Message });
                 return "";
             }
         }

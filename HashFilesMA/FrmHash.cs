@@ -22,6 +22,7 @@ namespace HashFilesMA
         private FileSelect _archivoSeleccionado;
         private CancellationTokenSource _cancelarMd5;
         private TipoHash tipoHash;
+
         public FrmHash()
         {
             InitializeComponent();
@@ -44,7 +45,7 @@ namespace HashFilesMA
 
         }
 
-        //Checkbox metodos
+        //Combobox metodos
         private void LLenaComboBox()
         {
             List<string> lst = new List<string>();
@@ -59,67 +60,66 @@ namespace HashFilesMA
 
 
 
-        private void _calculadoraMd5_Error(object sender, EventArgs e)
+        //Eventos calculadora hash
+        private void _calculadoraMd5_Error(object sender, ErrorHashFileArgs e)
         {
             _cancelarMd5.Dispose();
             _cancelarMd5 = new CancellationTokenSource();
-            MessageBox.Show("Ha ocurrido un error mientras se calculaba el MD5 o el procreso fue cancelado");
+            MessageBox.Show("Ha ocurrido un error mientras se calculaba el MD5 o el procreso fue cancelado" +e.Mensaje);
             Reset();
+            //Desabilita el boton de cancelar
+            btnCancelar.Enabled = false;
+            
+        }
+        private void _calculadoraMd5_ProgresoCompletado(object sender, EventArgs e)
+        {
+            //Desabilita el boton de cancelar
+            btnCancelar.Enabled = false;
+            notifyIcon1.ShowBalloonTip(2000, "Progreso", $"Calculado {tipoHash} de {_archivoSeleccionado.Nombre}", ToolTipIcon.Info);
+
+
+            
+            
+        }
+        private void _calculadoraMd5_ProgressMd5(object sender, ProgressHashFileArgs e)
+        {
+            progressBar1.Value = (int) (e.Progreso * 100f);
+            lblProgreso.Text = progressBar1.Value.ToString()+"%";
         }
 
+
+        //Eventos archivo seleccionado
+        private void _archivoSeleccionado_CambioArchivo(object sender, EventArgs e)
+        {
+            tolNombreArchivo.Text = _archivoSeleccionado.Nombre;
+        }
+
+        //Helpers
         private void Reset()
         {
+            
             _archivoSeleccionado.Clear();
             txtHASH.Clear();
             //txtMd5Comp.Clear();
             progressBar1.Value = 0;
 
         }
-        private void _archivoSeleccionado_CambioArchivo(object sender, EventArgs e)
-        {
-            tolNombreArchivo.Text = _archivoSeleccionado.Nombre;
-        }
 
 
-        //Eventos
-        private void _calculadoraMd5_ProgresoCompletado(object sender, EventArgs e)
-        {
-            notifyIcon1.ShowBalloonTip(5000, "Progreso", $"Calculado MD5 de {_archivoSeleccionado.Nombre}", ToolTipIcon.Info);
-        }
-
-
-        private void _calculadoraMd5_ProgressMd5(object sender, ProgressHashFileArgs e)
-        {
-            progressBar1.Value = (int) (e.Progreso * 100f);
-           
-        }
 
         void ProcesarArchivo(string ruta)
         {
             //Reset();
+            btnCancelar.Enabled = true;
+            tipoHash = (TipoHash)Enum.Parse(typeof(TipoHash), cbxTipoHash.Text);
 
-            _archivoSeleccionado.RutaArchivo = ruta;
-            tipoHash =(TipoHash)Enum.Parse(typeof(TipoHash), cbxTipoHash.Text);
+            string hashFile = this._calculadoraMd5.CalcularHashAll(tipoHash, ruta, _cancelarMd5.Token);
 
-            Task.Run(() =>
-            {
-                string hashFile = this._calculadoraMd5.CalcularHashAll(tipoHash,ruta, _cancelarMd5.Token);
-                txtHASH.Text = hashFile;
-
-            });
+            txtHASH.Text = hashFile;
         }
 
 
-        private void btnOpenFile_Click(object sender, EventArgs e)
-        {
-            
-            if(openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-
-                ProcesarArchivo(openFileDialog1.FileName);
-
-            }
-        }
+        
 
         #region BtnAbrirArchivoHoverDrag
         private string textOrigiguinal = "";
@@ -148,25 +148,43 @@ namespace HashFilesMA
 
         #endregion
 
+
+        //Metodo asyncrono
+        private void backProcressFile_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (!_archivoSeleccionado.Seleccionado) return;
+
+            ProcesarArchivo(_archivoSeleccionado.RutaArchivo);
+        }
+
         //Drop btn open file
+        private void btnOpenFile_Click(object sender, EventArgs e)
+        {
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                _archivoSeleccionado.RutaArchivo = openFileDialog1.FileName;
+                backProcressFile.RunWorkerAsync();
+
+            }
+        }
         private void btnOpenFile_DragDrop(object sender, DragEventArgs e)
         {
+            //Estilos por defecto
             btnOpenFile.BorderLineStyle = System.Drawing.Drawing2D.DashStyle.Solid;
             btnOpenFile.Text = textOrigiguinal;
 
+            //Si no existen archivos que se estan arrastrando
             if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
 
             string[] rutas = (string[]) e.Data.GetData(DataFormats.FileDrop);
 
             if (rutas.Length == 0) return;
 
-            string ruta = rutas[0];
-            ProcesarArchivo(ruta);
-
-
+            _archivoSeleccionado.RutaArchivo = rutas[0];
+            backProcressFile.RunWorkerAsync();
 
         }
-
         private void btnComparar_Click(object sender, EventArgs e)
         {
             
@@ -184,17 +202,19 @@ namespace HashFilesMA
             }
         }
 
-        private void backProcressFile_DoWork(object sender, DoWorkEventArgs e)
-        {
-            e.Cancel = true;
-
-        }
-
         private void btnCancelar_Click(object sender, EventArgs e)
         {
             if (_calculadoraMd5.EnProgreso)
             {
                 _cancelarMd5.Cancel();
+            }
+        }
+
+        private void cbxTipoHash_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this._archivoSeleccionado.Seleccionado && cbxTipoHash.Items.Count > 0)
+            {
+                backProcressFile.RunWorkerAsync();
             }
         }
     }

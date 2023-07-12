@@ -37,14 +37,15 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label3 = new System.Windows.Forms.Label();
             this.cbxTipoHash = new System.Windows.Forms.ComboBox();
-            this.btnCancelar = new HashFilesMA.Controles.ButtonCustom();
-            this.btnComparar = new HashFilesMA.Controles.ButtonCustom();
             this.txtHASHComp = new System.Windows.Forms.TextBox();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.tolNombreArchivo = new System.Windows.Forms.ToolStripStatusLabel();
             this.backProcressFile = new System.ComponentModel.BackgroundWorker();
+            this.lblProgreso = new System.Windows.Forms.Label();
+            this.btnCancelar = new HashFilesMA.Controles.ButtonCustom();
+            this.btnComparar = new HashFilesMA.Controles.ButtonCustom();
             this.btnOpenFile = new HashFilesMA.Controles.ButtonCustom();
             this.groupBox1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -76,9 +77,10 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(256, 344);
+            this.progressBar1.AccessibleRole = System.Windows.Forms.AccessibleRole.ProgressBar;
+            this.progressBar1.Location = new System.Drawing.Point(245, 354);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(354, 23);
+            this.progressBar1.Size = new System.Drawing.Size(386, 33);
             this.progressBar1.TabIndex = 3;
             // 
             // groupBox1
@@ -90,7 +92,8 @@
             this.groupBox1.Controls.Add(this.txtHASHComp);
             this.groupBox1.Controls.Add(this.txtHASH);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(17, 175);
+            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox1.Location = new System.Drawing.Point(27, 175);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(802, 145);
             this.groupBox1.TabIndex = 4;
@@ -113,54 +116,9 @@
             this.cbxTipoHash.FormattingEnabled = true;
             this.cbxTipoHash.Location = new System.Drawing.Point(90, 20);
             this.cbxTipoHash.Name = "cbxTipoHash";
-            this.cbxTipoHash.Size = new System.Drawing.Size(121, 21);
+            this.cbxTipoHash.Size = new System.Drawing.Size(121, 24);
             this.cbxTipoHash.TabIndex = 9;
-            // 
-            // btnCancelar
-            // 
-            this.btnCancelar.AllowDrop = true;
-            this.btnCancelar.BorderColor = System.Drawing.Color.Coral;
-            this.btnCancelar.BorderColor2 = System.Drawing.Color.Crimson;
-            this.btnCancelar.BorderDashStyle = System.Drawing.Drawing2D.DashCap.Round;
-            this.btnCancelar.BorderLineStyle = System.Drawing.Drawing2D.DashStyle.Solid;
-            this.btnCancelar.BorderRadiusPercent = 100;
-            this.btnCancelar.BorderSizePx = 2;
-            this.btnCancelar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancelar.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCancelar.GradientBorder = true;
-            this.btnCancelar.GradientBorderAngle = 45;
-            this.btnCancelar.Location = new System.Drawing.Point(657, 91);
-            this.btnCancelar.Name = "btnCancelar";
-            this.btnCancelar.Size = new System.Drawing.Size(139, 38);
-            this.btnCancelar.TabIndex = 5;
-            this.btnCancelar.Text = "Cancelar";
-            this.btnCancelar.UseCompatibleTextRendering = true;
-            this.btnCancelar.UseVisualStyleBackColor = true;
-            this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click);
-            // 
-            // btnComparar
-            // 
-            this.btnComparar.AllowDrop = true;
-            this.btnComparar.BorderColor = System.Drawing.Color.LightSeaGreen;
-            this.btnComparar.BorderColor2 = System.Drawing.Color.DodgerBlue;
-            this.btnComparar.BorderDashStyle = System.Drawing.Drawing2D.DashCap.Round;
-            this.btnComparar.BorderLineStyle = System.Drawing.Drawing2D.DashStyle.Solid;
-            this.btnComparar.BorderRadiusPercent = 50;
-            this.btnComparar.BorderSizePx = 2;
-            this.btnComparar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnComparar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnComparar.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnComparar.GradientBorder = true;
-            this.btnComparar.GradientBorderAngle = 45;
-            this.btnComparar.Location = new System.Drawing.Point(326, 91);
-            this.btnComparar.Name = "btnComparar";
-            this.btnComparar.Size = new System.Drawing.Size(139, 38);
-            this.btnComparar.TabIndex = 4;
-            this.btnComparar.Text = "Comparar";
-            this.btnComparar.UseCompatibleTextRendering = true;
-            this.btnComparar.UseVisualStyleBackColor = true;
-            this.btnComparar.Click += new System.EventHandler(this.btnComparar_Click);
+            this.cbxTipoHash.SelectedIndexChanged += new System.EventHandler(this.cbxTipoHash_SelectedIndexChanged);
             // 
             // txtHASHComp
             // 
@@ -203,6 +161,64 @@
             // 
             this.backProcressFile.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backProcressFile_DoWork);
             // 
+            // lblProgreso
+            // 
+            this.lblProgreso.AutoSize = true;
+            this.lblProgreso.BackColor = System.Drawing.Color.Transparent;
+            this.lblProgreso.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblProgreso.Location = new System.Drawing.Point(415, 361);
+            this.lblProgreso.Name = "lblProgreso";
+            this.lblProgreso.Size = new System.Drawing.Size(31, 18);
+            this.lblProgreso.TabIndex = 7;
+            this.lblProgreso.Text = "0%";
+            // 
+            // btnCancelar
+            // 
+            this.btnCancelar.AllowDrop = true;
+            this.btnCancelar.BorderColor = System.Drawing.Color.Coral;
+            this.btnCancelar.BorderColor2 = System.Drawing.Color.Crimson;
+            this.btnCancelar.BorderDashStyle = System.Drawing.Drawing2D.DashCap.Round;
+            this.btnCancelar.BorderLineStyle = System.Drawing.Drawing2D.DashStyle.Solid;
+            this.btnCancelar.BorderRadiusPercent = 100;
+            this.btnCancelar.BorderSizePx = 2;
+            this.btnCancelar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCancelar.Enabled = false;
+            this.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCancelar.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCancelar.GradientBorder = true;
+            this.btnCancelar.GradientBorderAngle = 45;
+            this.btnCancelar.Location = new System.Drawing.Point(657, 91);
+            this.btnCancelar.Name = "btnCancelar";
+            this.btnCancelar.Size = new System.Drawing.Size(139, 38);
+            this.btnCancelar.TabIndex = 5;
+            this.btnCancelar.Text = "Cancelar";
+            this.btnCancelar.UseCompatibleTextRendering = true;
+            this.btnCancelar.UseVisualStyleBackColor = true;
+            this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click);
+            // 
+            // btnComparar
+            // 
+            this.btnComparar.AllowDrop = true;
+            this.btnComparar.BorderColor = System.Drawing.Color.LightSeaGreen;
+            this.btnComparar.BorderColor2 = System.Drawing.Color.DodgerBlue;
+            this.btnComparar.BorderDashStyle = System.Drawing.Drawing2D.DashCap.Round;
+            this.btnComparar.BorderLineStyle = System.Drawing.Drawing2D.DashStyle.Solid;
+            this.btnComparar.BorderRadiusPercent = 50;
+            this.btnComparar.BorderSizePx = 2;
+            this.btnComparar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnComparar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnComparar.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnComparar.GradientBorder = true;
+            this.btnComparar.GradientBorderAngle = 45;
+            this.btnComparar.Location = new System.Drawing.Point(326, 91);
+            this.btnComparar.Name = "btnComparar";
+            this.btnComparar.Size = new System.Drawing.Size(139, 38);
+            this.btnComparar.TabIndex = 4;
+            this.btnComparar.Text = "Comparar";
+            this.btnComparar.UseCompatibleTextRendering = true;
+            this.btnComparar.UseVisualStyleBackColor = true;
+            this.btnComparar.Click += new System.EventHandler(this.btnComparar_Click);
+            // 
             // btnOpenFile
             // 
             this.btnOpenFile.AllowDrop = true;
@@ -217,7 +233,7 @@
             this.btnOpenFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnOpenFile.GradientBorder = true;
             this.btnOpenFile.GradientBorderAngle = 45;
-            this.btnOpenFile.Location = new System.Drawing.Point(256, 12);
+            this.btnOpenFile.Location = new System.Drawing.Point(281, 12);
             this.btnOpenFile.Name = "btnOpenFile";
             this.btnOpenFile.Size = new System.Drawing.Size(314, 157);
             this.btnOpenFile.TabIndex = 0;
@@ -229,16 +245,18 @@
             this.btnOpenFile.DragEnter += new System.Windows.Forms.DragEventHandler(this.btnOpenFile_DragEnter);
             this.btnOpenFile.DragLeave += new System.EventHandler(this.btnOpenFile_DragLeave);
             // 
-            // Form1
+            // FrmHash
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(857, 467);
+            this.Controls.Add(this.lblProgreso);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.btnOpenFile);
-            this.Name = "Form1";
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Name = "FrmHash";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MD5";
             this.groupBox1.ResumeLayout(false);
@@ -268,6 +286,7 @@
         private Controles.ButtonCustom btnCancelar;
         private System.Windows.Forms.ComboBox cbxTipoHash;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label lblProgreso;
     }
 }
 

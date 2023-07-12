@@ -17,7 +17,7 @@ namespace HashFilesMA.Helpers
         {
             get
             {
-                return this.RutaArchivo != string.Empty;
+                return this.RutaArchivo != "";
             }
         }
         public string RutaArchivo
@@ -65,7 +65,7 @@ namespace HashFilesMA.Helpers
         }
         public FileSelect()
         {
-
+            this._rutaArchivo = "";
         }
     }
 }

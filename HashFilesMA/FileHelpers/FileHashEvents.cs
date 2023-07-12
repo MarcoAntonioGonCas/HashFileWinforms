@@ -13,12 +13,16 @@ namespace HashFilesMA.FileHelpers
         public long Bytes { get; set; }
         public long TotalBytes { get; set; }
     }
+    public class ErrorHashFileArgs : EventArgs
+    {
+        public string Mensaje { get; set; }
+    }
     public delegate void ProgressHashFileHandler(object sender, ProgressHashFileArgs args);
     public abstract class FileHashEvents
     {
         public event ProgressHashFileHandler Progreso;
         public event EventHandler ProgresoCompletado;
-        public event EventHandler Error;
+        public event EventHandler<ErrorHashFileArgs> Error;
 
         protected void OnProgreso(ProgressHashFileArgs args)
         {
@@ -29,7 +33,7 @@ namespace HashFilesMA.FileHelpers
         {
             ProgresoCompletado?.Invoke(this, args);
         }
-        protected void OnError(EventArgs args)
+        protected void OnError(ErrorHashFileArgs args)
         {
             Error?.Invoke(this, args);
         }
