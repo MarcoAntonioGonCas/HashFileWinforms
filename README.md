@@ -11,8 +11,10 @@ Puedes usar la aplicacion de las siguientes formas:
 
 
 ## Funciones extra
-Comparacion de hashes se puede ingresar otro hash y la aplicacion indicara si coinciden.
+- Comparacion de hashes se puede ingresar otro hash y la aplicacion indicara si coinciden.
+- Calcula HMAC tambien atravez de una clave secreta
 
 ### Imagenes
 Aplicacion :computer:.
 ![Imagen sistema](/assets/images/HashFileImg.png)
+![Imagen sistema clave](/assets/images/HashFileImgClave.png)

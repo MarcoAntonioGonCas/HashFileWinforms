@@ -53,6 +53,12 @@
     <Compile Include="FileHelpers\FileHash.cs" />
     <Compile Include="FileHelpers\FileHmacHash.cs" />
     <Compile Include="FileHelpers\FileHmacHashCalculator.cs" />
+    <Compile Include="FrmClave.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmClave.Designer.cs">
+      <DependentUpon>FrmClave.cs</DependentUpon>
+    </Compile>
     <Compile Include="FrmHash.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -60,10 +66,14 @@
       <DependentUpon>FrmHash.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\BytesConverter.cs" />
+    <Compile Include="Helpers\ComboHelper.cs" />
     <Compile Include="Helpers\FileSelect.cs" />
     <Compile Include="FileHelpers\FileHashCalculator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FrmClave.resx">
+      <DependentUpon>FrmClave.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FrmHash.resx">
       <DependentUpon>FrmHash.cs</DependentUpon>
     </EmbeddedResource>

@@ -15,13 +15,27 @@ using HashFilesMA.FileHelpers;
 
 namespace HashFilesMA
 {
+
+    enum TipoSeleccionado
+    {
+        Hash,
+        Hmac
+    }
+
     public partial class FrmHash : Form
     {
         //Propiedades
-        private FileHashCalculator _calculadoraMd5;
+        private FileHashCalculator _calculadoraHash;
+        private FileHmacHashCalculator _calculadoraHmac;
+
+
         private FileSelect _archivoSeleccionado;
-        private CancellationTokenSource _cancelarMd5;
+        private CancellationTokenSource _cancelarProcesoHash;
         private TipoHash tipoHash;
+        private TipoHMACHash tipoHmac;
+
+        //Indica el tipo que se calculara hmac o hash
+        TipoSeleccionado tipoSeleccionado = TipoSeleccionado.Hash;
 
         public FrmHash()
         {
@@ -30,61 +44,73 @@ namespace HashFilesMA
             _archivoSeleccionado = new FileSelect();
             _archivoSeleccionado.CambioArchivo += _archivoSeleccionado_CambioArchivo;
 
-            _calculadoraMd5 = new FileHashCalculator();
-            _calculadoraMd5.Progreso += _calculadoraMd5_ProgressMd5;
-            _calculadoraMd5.ProgresoCompletado += _calculadoraMd5_ProgresoCompletado;
-            _calculadoraMd5.Error += _calculadoraMd5_Error;
+            //Calculadora hash
+            _calculadoraHash = new FileHashCalculator();
+            _calculadoraHash.Progreso += _calculadoraHash_Progreso;
+            _calculadoraHash.ProgresoCompletado += _calculadoraHash_ProgresoCompletado;
+            _calculadoraHash.Error += _calculadoraHash_Error;
+
+            tipoHash = TipoHash.MD5;
+
+            //calculadora hmac
+            _calculadoraHmac = new FileHmacHashCalculator();
+            _calculadoraHmac.Progreso += _calculadoraHash_Progreso;
+            _calculadoraHmac.ProgresoCompletado += _calculadoraHash_ProgresoCompletado;
+            _calculadoraHmac.Error += _calculadoraHash_Error;
+
+            tipoHmac = TipoHMACHash.HMACMD5;
 
             //extra
-            _cancelarMd5 = new CancellationTokenSource();
+            _cancelarProcesoHash = new CancellationTokenSource();
 
             //otros
-            tipoHash = TipoHash.MD5;
-            LLenaComboBox();
+            LLenaComboBoxHash();
 
 
         }
 
         //Combobox metodos
-        private void LLenaComboBox()
+        private void LLenaComboBoxHash()
         {
-            List<string> lst = new List<string>();
-
-
-            lst.AddRange(Enum.GetNames(typeof(TipoHash)));
-
-
-            cbxTipoHash.DataSource = lst;
+            cbxTipoHash.LLenaCbxDeEnum<TipoHash>();
+            cbxTipoHmac.LLenaCbxDeEnum<TipoHMACHash>();
         }
-
+        
 
 
 
         //Eventos calculadora hash
-        private void _calculadoraMd5_Error(object sender, ErrorHashFileArgs e)
+        private void _calculadoraHash_Error(object sender, ErrorHashFileArgs e)
         {
-            _cancelarMd5.Dispose();
-            _cancelarMd5 = new CancellationTokenSource();
-            MessageBox.Show("Ha ocurrido un error mientras se calculaba el MD5 o el procreso fue cancelado" +e.Mensaje);
+            _cancelarProcesoHash.Dispose();
+            _cancelarProcesoHash = new CancellationTokenSource();
+            MessageBox.Show("Ha ocurrido un error mientras se calculaba el hash o el procreso fue cancelado" +e.Mensaje);
             Reset();
             //Desabilita el boton de cancelar
             btnCancelar.Enabled = false;
             
         }
-        private void _calculadoraMd5_ProgresoCompletado(object sender, EventArgs e)
+        private void _calculadoraHash_ProgresoCompletado(object sender, EventArgs e)
         {
             //Desabilita el boton de cancelar
             btnCancelar.Enabled = false;
-            notifyIcon1.ShowBalloonTip(2000, "Progreso", $"Calculado {tipoHash} de {_archivoSeleccionado.Nombre}", ToolTipIcon.Info);
+
+            string nombreTipoSeleccionado = tipoSeleccionado == TipoSeleccionado.Hash ?tipoHash.ToString() :tipoHmac.ToString();
+
+            if (habilitarNotificacionesToolStripMenuItem.Checked)
+            {
+                notifyIcon1.ShowBalloonTip(2000, "Completado", $"Calculado {nombreTipoSeleccionado} de {_archivoSeleccionado.Nombre}", ToolTipIcon.Info);
+
+            }
 
 
             
             
         }
-        private void _calculadoraMd5_ProgressMd5(object sender, ProgressHashFileArgs e)
+        private void _calculadoraHash_Progreso(object sender, ProgressHashFileArgs e)
         {
-            progressBar1.Value = (int) (e.Progreso * 100f);
-            lblProgreso.Text = progressBar1.Value.ToString()+"%";
+            prgFileHash.Value = (int) (e.Progreso * 100f);
+            lblProgreso.Text = prgFileHash.Value.ToString()+"%";
         }
 
 
@@ -101,7 +127,7 @@ namespace HashFilesMA
             _archivoSeleccionado.Clear();
             txtHASH.Clear();
             //txtMd5Comp.Clear();
-            progressBar1.Value = 0;
+            prgFileHash.Value = 0;
 
         }
 
@@ -111,9 +137,28 @@ namespace HashFilesMA
         {
             //Reset();
             btnCancelar.Enabled = true;
-            tipoHash = (TipoHash)Enum.Parse(typeof(TipoHash), cbxTipoHash.Text);
+            tipoHash = cbxTipoHash.DevuelveEnumSeleccionado<TipoHash>();
+            tipoHmac = cbxTipoHmac.DevuelveEnumSeleccionado<TipoHMACHash>();
 
-            string hashFile = this._calculadoraMd5.CalcularHashAll(tipoHash, ruta, _cancelarMd5.Token);
+
+            string hashFile = "";
+            
+
+            if(tipoSeleccionado == TipoSeleccionado.Hash)
+            {
+
+                hashFile = this._calculadoraHash.CalcularHashAll(tipoHash, ruta, _cancelarProcesoHash.Token);
+            }
+            else
+            {
+                if (!FrmClave.EsClaveValida)
+                {
+                    MessageBox.Show("No es una clave valida");
+                    return;
+                }
+                string key = FrmClave.ObtenerClave();
+                hashFile = this._calculadoraHmac.CalcularHashAll(tipoHmac, ruta, key, _cancelarProcesoHash.Token);
+            }
 
             txtHASH.Text = hashFile;
         }
@@ -204,18 +249,62 @@ namespace HashFilesMA
 
         private void btnCancelar_Click(object sender, EventArgs e)
         {
-            if (_calculadoraMd5.EnProgreso)
+            if (_calculadoraHash.EnProgreso)
             {
-                _cancelarMd5.Cancel();
+                _cancelarProcesoHash.Cancel();
             }
         }
 
         private void cbxTipoHash_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (this._archivoSeleccionado.Seleccionado && cbxTipoHash.Items.Count > 0)
+            if (this._archivoSeleccionado.Seleccionado && ((ComboBox)sender).Items.Count > 0)
             {
                 backProcressFile.RunWorkerAsync();
             }
+        }
+
+        
+        //Intercambiar entre hmac o hash
+       
+        private void IntercambiarSeleccionHash(bool hash)
+        {
+            if (hash)
+            {
+                tipoSeleccionado = TipoSeleccionado.Hash;
+            }
+            else
+            {
+                tipoSeleccionado = TipoSeleccionado.Hmac;
+            }
+            pnlConteHash.Enabled = hash;
+
+            pnlConteHmac.Enabled = !hash;
+
+
+        }
+        private void btnIntercambiar_Click(object sender, EventArgs e)
+        {
+            IntercambiarSeleccionHash(!pnlConteHash.Enabled);
+            if (_archivoSeleccionado.Seleccionado)
+            {
+                backProcressFile.RunWorkerAsync();
+            }
+        }
+
+
+
+        //Clave
+        private void btnClave_Click(object sender, EventArgs e)
+        {
+            new FrmClave().ShowDialog();
+
+
+
+        }
+
+        private void habilitarNotificacionesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            habilitarNotificacionesToolStripMenuItem.Checked = !habilitarNotificacionesToolStripMenuItem.Checked;
         }
     }
 }
