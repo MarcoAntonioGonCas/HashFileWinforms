@@ -20,7 +20,14 @@ namespace HashFilesMA.FileHelpers
         SHA512,
     }
 
+    public class HashValue
+    {
+        public TipoHash TipoHash { get; set; }
+        public byte[] Hash { get; set; }    
+        public string HashHex { get; set; }
+    }
 
+    //Todo implementarlo 
     public abstract class FileHash:FileHashEvents
     {
         protected long lengthBuffer { get; set; }
@@ -28,5 +35,8 @@ namespace HashFilesMA.FileHelpers
         public abstract string CalcularHashText(TipoHash tipo, string text);
         public abstract string CalcularHashAll(TipoHash tipo, string ruta, CancellationToken? token);
         public abstract string CalcularHashAll(TipoHash tipo, string ruta);
+
+        public abstract HashValue[] CalcularMultipleHash(TipoHash[] tipos, string ruta);
+        public abstract HashValue[] CalcularMultipleHash(TipoHash[] tipos, string ruta,CancellationToken? token);
     }
 }

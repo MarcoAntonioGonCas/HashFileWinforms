@@ -82,7 +82,7 @@ namespace HashFilesMA.Helpers
 
 
         //Extra
-
+        
         public static string BytesToHexEvil(byte[] bytes)
         {
             StringBuilder strhex = new StringBuilder();
@@ -144,7 +144,7 @@ namespace HashFilesMA.Helpers
 
 
         //Hex to bytes
-
+        //Los bits mas significativos estan al principio
         public static byte[] HexToBytes(string hex) {
             Regex regex = new Regex("^[0-9a-fA-F]+");
 

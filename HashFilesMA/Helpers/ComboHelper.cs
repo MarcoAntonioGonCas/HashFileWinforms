@@ -24,6 +24,14 @@ namespace HashFilesMA.Helpers
 
             return seleccionado;
         }
-
+        public static T[] ObtenerHashSeleccionados<T>(CheckedListBox checkedListBox) where T : Enum
+        {
+            T[] tipos = new T[checkedListBox.CheckedItems.Count];
+            for (int i = 0; i < checkedListBox.CheckedItems.Count; i++)
+            {
+                tipos[i] = (T)Enum.Parse(typeof(T), checkedListBox.CheckedItems[i].ToString());
+            }
+            return tipos;
+        }
     }
 }

@@ -15,15 +15,13 @@ using HashFilesMA.FileHelpers;
 
 namespace HashFilesMA
 {
-
-    enum TipoSeleccionado
-    {
-        Hash,
-        Hmac
-    }
-
     public partial class FrmHash : Form
     {
+        private enum TipoSeleccionado
+        {
+            Hash,
+            Hmac
+        }
         //Propiedades
         private FileHashCalculator _calculadoraHash;
         private FileHmacHashCalculator _calculadoraHmac;
@@ -31,8 +29,11 @@ namespace HashFilesMA
 
         private FileSelect _archivoSeleccionado;
         private CancellationTokenSource _cancelarProcesoHash;
-        private TipoHash tipoHash;
-        private TipoHMACHash tipoHmac;
+
+        private TipoHash[] tiposHashCalcular;
+
+        //TODO: Completar hmac
+        private TipoHMACHash[] tiposHmac;
 
         //Indica el tipo que se calculara hmac o hash
         TipoSeleccionado tipoSeleccionado = TipoSeleccionado.Hash;
@@ -50,7 +51,7 @@ namespace HashFilesMA
             _calculadoraHash.ProgresoCompletado += _calculadoraHash_ProgresoCompletado;
             _calculadoraHash.Error += _calculadoraHash_Error;
 
-            tipoHash = TipoHash.MD5;
+            tiposHashCalcular = new TipoHash[0];
 
             //calculadora hmac
             _calculadoraHmac = new FileHmacHashCalculator();
@@ -58,23 +59,15 @@ namespace HashFilesMA
             _calculadoraHmac.ProgresoCompletado += _calculadoraHash_ProgresoCompletado;
             _calculadoraHmac.Error += _calculadoraHash_Error;
 
-            tipoHmac = TipoHMACHash.HMACMD5;
+            tiposHmac = new TipoHMACHash[0];
 
             //extra
             _cancelarProcesoHash = new CancellationTokenSource();
 
-            //otros
-            LLenaComboBoxHash();
-
 
         }
 
-        //Combobox metodos
-        private void LLenaComboBoxHash()
-        {
-            cbxTipoHash.LLenaCbxDeEnum<TipoHash>();
-            cbxTipoHmac.LLenaCbxDeEnum<TipoHMACHash>();
-        }
+
         
 
 
@@ -84,7 +77,7 @@ namespace HashFilesMA
         {
             _cancelarProcesoHash.Dispose();
             _cancelarProcesoHash = new CancellationTokenSource();
-            MessageBox.Show("Ha ocurrido un error mientras se calculaba el hash o el procreso fue cancelado" +e.Mensaje);
+            MessageBox.Show("Ha ocurrido un error mientras se calculaba el hash o el procreso fue cancelado" + e.Mensaje);
             Reset();
             //Desabilita el boton de cancelar
             btnCancelar.Enabled = false;
@@ -95,18 +88,13 @@ namespace HashFilesMA
             //Desabilita el boton de cancelar
             btnCancelar.Enabled = false;
 
-            string nombreTipoSeleccionado = tipoSeleccionado == TipoSeleccionado.Hash ?tipoHash.ToString() :tipoHmac.ToString();
-
             if (habilitarNotificacionesToolStripMenuItem.Checked)
             {
-                notifyIcon1.ShowBalloonTip(2000, "Completado", $"Calculado {nombreTipoSeleccionado} de {_archivoSeleccionado.Nombre}", ToolTipIcon.Info);
+                notifyIcon1.ShowBalloonTip(2000, "Completado", $"Calculado {tipoSeleccionado.ToString()} de {_archivoSeleccionado.Nombre}", ToolTipIcon.Info);
 
-            }
-
-
-            
-            
+            }            
         }
+
         private void _calculadoraHash_Progreso(object sender, ProgressHashFileArgs e)
         {
             prgFileHash.Value = (int) (e.Progreso * 100f);
@@ -125,10 +113,8 @@ namespace HashFilesMA
         {
             
             _archivoSeleccionado.Clear();
-            txtHASH.Clear();
-            //txtMd5Comp.Clear();
             prgFileHash.Value = 0;
-
+            
         }
 
 
@@ -136,18 +122,20 @@ namespace HashFilesMA
         void ProcesarArchivo(string ruta)
         {
             //Reset();
+            this.fileHashSelectorControl1.LimpiaCampos();
+            this.fileHmacSelectorControl1.LimpiaCampos();
             btnCancelar.Enabled = true;
-            tipoHash = cbxTipoHash.DevuelveEnumSeleccionado<TipoHash>();
-            tipoHmac = cbxTipoHmac.DevuelveEnumSeleccionado<TipoHMACHash>();
+            tiposHashCalcular = fileHashSelectorControl1.ObtieneTiposSeleccionados();
+            tiposHmac = fileHmacSelectorControl1.ObtieneTiposSeleccionados();
 
 
-            string hashFile = "";
+                
             
 
             if(tipoSeleccionado == TipoSeleccionado.Hash)
             {
-
-                hashFile = this._calculadoraHash.CalcularHashAll(tipoHash, ruta, _cancelarProcesoHash.Token);
+                HashValue[] hashValues = this._calculadoraHash.CalcularMultipleHash(tiposHashCalcular, ruta, _cancelarProcesoHash.Token);
+                fileHashSelectorControl1.LLenaTextbox(hashValues);
             }
             else
             {
@@ -157,10 +145,11 @@ namespace HashFilesMA
                     return;
                 }
                 string key = FrmClave.ObtenerClave();
-                hashFile = this._calculadoraHmac.CalcularHashAll(tipoHmac, ruta, key, _cancelarProcesoHash.Token);
+                HmacValue[] hmacValues = this._calculadoraHmac.CalcularMultipleHash(tiposHmac, ruta, key, _cancelarProcesoHash.Token);
+                this.fileHmacSelectorControl1.LLenaTextbox(hmacValues);
+
             }
 
-            txtHASH.Text = hashFile;
         }
 
 
@@ -230,21 +219,22 @@ namespace HashFilesMA
             backProcressFile.RunWorkerAsync();
 
         }
+        //Todo repara
         private void btnComparar_Click(object sender, EventArgs e)
         {
             
-            if ( txtHASH.Text == "" || txtHASHComp.Text == "" ) return;
+            //if ( txtHASH.Text == "" || txtHASHComp.Text == "" ) return;
             
                
             
-            if( txtHASH.Text == txtHASHComp.Text )
-            {
-                MessageBox.Show("Los campos son iguales","Comparacion",MessageBoxButtons.OK,MessageBoxIcon.Information);
-            }
-            else
-            {
-                MessageBox.Show("Los campos son diferentes","Comparacion",MessageBoxButtons.OK,MessageBoxIcon.Error);
-            }
+            //if( txtHASH.Text == txtHASHComp.Text )
+            //{
+            //    MessageBox.Show("Los campos son iguales","Comparacion",MessageBoxButtons.OK,MessageBoxIcon.Information);
+            //}
+            //else
+            //{
+            //    MessageBox.Show("Los campos son diferentes","Comparacion",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            //}
         }
 
         private void btnCancelar_Click(object sender, EventArgs e)
@@ -255,56 +245,21 @@ namespace HashFilesMA
             }
         }
 
-        private void cbxTipoHash_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (this._archivoSeleccionado.Seleccionado && ((ComboBox)sender).Items.Count > 0)
-            {
-                backProcressFile.RunWorkerAsync();
-            }
-        }
-
-        
-        //Intercambiar entre hmac o hash
-       
-        private void IntercambiarSeleccionHash(bool hash)
-        {
-            if (hash)
-            {
-                tipoSeleccionado = TipoSeleccionado.Hash;
-            }
-            else
-            {
-                tipoSeleccionado = TipoSeleccionado.Hmac;
-            }
-            pnlConteHash.Enabled = hash;
-
-            pnlConteHmac.Enabled = !hash;
-
-
-        }
-        private void btnIntercambiar_Click(object sender, EventArgs e)
-        {
-            IntercambiarSeleccionHash(!pnlConteHash.Enabled);
-            if (_archivoSeleccionado.Seleccionado)
-            {
-                backProcressFile.RunWorkerAsync();
-            }
-        }
-
-
-
-        //Clave
-        private void btnClave_Click(object sender, EventArgs e)
-        {
-            new FrmClave().ShowDialog();
-
-
-
-        }
-
         private void habilitarNotificacionesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             habilitarNotificacionesToolStripMenuItem.Checked = !habilitarNotificacionesToolStripMenuItem.Checked;
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(tabControl1.SelectedIndex == 0)
+            {
+                this.tipoSeleccionado = TipoSeleccionado.Hash;
+            }
+            else
+            {
+                this.tipoSeleccionado = TipoSeleccionado.Hmac;
+            }
         }
     }
 }

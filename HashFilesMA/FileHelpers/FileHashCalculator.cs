@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Threading;
 using HashFilesMA.Helpers;
+using System.Security.Policy;
+using System.Windows.Forms;
+using System.Net.Http.Headers;
 
 namespace HashFilesMA.FileHelpers
 {
@@ -54,6 +57,7 @@ namespace HashFilesMA.FileHelpers
             else if (tipo == TipoHash.SHA512)
             {
                 hash = SHA512.Create();
+                
             }
             else
             {
@@ -172,5 +176,101 @@ namespace HashFilesMA.FileHelpers
                 return "";
             }
         }
+
+
+
+        //Calular multiples hash
+        public override HashValue[] CalcularMultipleHash(TipoHash[] tipos, string ruta)
+        {
+           return CalcularMultipleHash(tipos, ruta, null);
+        }
+
+        public override HashValue[] CalcularMultipleHash(TipoHash[] tipos, string ruta, CancellationToken? token)
+        {
+            try
+            {
+                //Los hashesh tendran la misma longitud los tipos de hash a calcular
+                HashValue[] hashes = new HashValue[tipos.Length];  
+                //Obtenemos todos los algoritmos hash a utilizar
+                HashAlgorithm[] algoritmos = tipos.Select( tipo => ObtieneHash(tipo) ).ToArray();
+
+
+                //Abrimos el archivos en modo lectura 
+                using (FileStream fs = new FileStream(ruta, FileMode.Open, FileAccess.Read))
+                {
+                    //Obtenemos el tamaño del archivo
+                    long tamanioArchivo = fs.Length;
+                    long contadorLeidos = 0;
+
+                    byte[] buffer = new byte[lengthBuffer];
+                    int leidos;
+
+                    //Leeamos en bloques
+                    while ((leidos = fs.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        //Si se solicita la concelacion de la operacion la realizamos
+                        if (token.HasValue && token.Value.IsCancellationRequested)
+                        {
+                            _enProgreso = false;
+                            throw new OperationCanceledException();
+                        }
+
+                        contadorLeidos += leidos;
+
+                        //Recorremos cada algoritmo
+                        foreach(HashAlgorithm algoritmo in algoritmos)
+                        {
+                            //Calculalamos el bloque en el algoritmo actual
+                            algoritmo.TransformBlock(buffer, 0, leidos, null,0);
+                            
+                        }
+
+                        //Invocamos el evento de progreso pasando los bytes leidos
+                        //El total de bytes
+                        OnProgreso(new ProgressHashFileArgs()
+                        {
+                            Bytes = contadorLeidos,
+                            TotalBytes = tamanioArchivo,
+                            Progreso = contadorLeidos / (float)tamanioArchivo // Progreso 0.0 - 1.0
+                        });
+                    }
+                    //Finalmente recorremos de  
+                    for(int i = 0; i < algoritmos.Length; i++)
+                    {
+                        algoritmos[i].TransformFinalBlock(buffer, 0,0);
+
+                        hashes[i] = new HashValue()
+                        {
+                            Hash = algoritmos[i].Hash,
+                            TipoHash = tipos[i]
+                        };
+                        hashes[i].HashHex = BytesConverter.ConvertBytesToHex(hashes[i].Hash);
+
+                        algoritmos[i].Dispose();
+                    }
+
+                    OnProgresoCompletado(EventArgs.Empty);
+
+
+
+                    _enProgreso = false;
+
+                    return hashes;
+
+                }
+
+
+            }
+            catch(Exception ex)
+            {
+                OnError(new ErrorHashFileArgs { Mensaje = ex.Message });
+
+                return new HashValue[0];
+            }
+        }
+
+
+
+
     }
 }

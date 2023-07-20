@@ -53,6 +53,18 @@
     <Compile Include="FileHelpers\FileHash.cs" />
     <Compile Include="FileHelpers\FileHmacHash.cs" />
     <Compile Include="FileHelpers\FileHmacHashCalculator.cs" />
+    <Compile Include="Forms\FileHashSelectorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\FileHashSelectorControl.Designer.cs">
+      <DependentUpon>FileHashSelectorControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FileHmacSelectorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\FileHmacSelectorControl.Designer.cs">
+      <DependentUpon>FileHmacSelectorControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="FrmClave.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -71,6 +83,12 @@
     <Compile Include="FileHelpers\FileHashCalculator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Forms\FileHashSelectorControl.resx">
+      <DependentUpon>FileHashSelectorControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FileHmacSelectorControl.resx">
+      <DependentUpon>FileHmacSelectorControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FrmClave.resx">
       <DependentUpon>FrmClave.cs</DependentUpon>
     </EmbeddedResource>

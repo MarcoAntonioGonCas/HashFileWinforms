@@ -15,6 +15,12 @@ namespace HashFilesMA.FileHelpers
         HMACSHA384,
         HMACSHA512,
     }
+    public class HmacValue
+    {
+        public TipoHMACHash TipoHash { get; set; }
+        public byte[] Hash { get; set; }
+        public string HashHex { get; set; }
+    }
     public abstract class FileHmacHash:FileHashEvents
     {
 
@@ -23,6 +29,7 @@ namespace HashFilesMA.FileHelpers
         public abstract string CalcularHashText(TipoHMACHash tipo, string text,string key);
         public abstract string CalcularHashAll(TipoHMACHash tipo, string ruta, string key, CancellationToken? token);
         public abstract string CalcularHashAll(TipoHMACHash tipo, string ruta, string key);
-
+        public abstract HmacValue[] CalcularMultipleHash(TipoHMACHash[] tipos, string ruta, string key);
+        public abstract HmacValue[] CalcularMultipleHash(TipoHMACHash[] tipos, string ruta, string key, CancellationToken? token);
     }
 }

@@ -40,12 +40,10 @@ namespace HashFilesMA.FileHelpers
             long contadorBytes = 0;
 
             using ( FileStream fs = new FileStream( ruta, FileMode.Open, FileAccess.Read))
-            using ( HMAC hmac = ObtieneClaseHmac( tipo ))
+            using ( HMAC hmac = ObtieneClaseHmac( tipo, Encoding.Default.GetBytes(key)))
             {
                 long totalBytes = fs.Length;
                 int leidos = 0;
-
-                hmac.Key = Encoding.Default.GetBytes(key);
 
                 while ((leidos = fs.Read(buffer, 0, (int)this.lengthBuffer)) > 0 )  { 
                     
@@ -113,9 +111,8 @@ namespace HashFilesMA.FileHelpers
             try
             {
 
-                using(HMAC hmac = ObtieneClaseHmac(tipo))
+                using(HMAC hmac = ObtieneClaseHmac(tipo, Encoding.Default.GetBytes(key)))
                 {
-                    hmac.Key = Encoding.Default.GetBytes(key);
                     byte[] bytesText = Encoding.Default.GetBytes(text);
                     byte[] bytesHash = hmac.ComputeHash(bytesText);
                     OnProgreso(new ProgressHashFileArgs()
@@ -141,29 +138,29 @@ namespace HashFilesMA.FileHelpers
 
 
         //Others
-        private HMAC ObtieneClaseHmac(TipoHMACHash tipo)
+        private HMAC ObtieneClaseHmac(TipoHMACHash tipo, byte[] key)
         {
             HMAC hmac = null;
 
             if(tipo == TipoHMACHash.HMACMD5)
             {
-                hmac = HMACMD5.Create();
+                hmac = new HMACMD5(key);
             }
             else if(tipo == TipoHMACHash.HMACSHA1)
             {
-                hmac = HMACSHA1.Create();
+                hmac = new HMACSHA1(key);
             }
             else if (tipo == TipoHMACHash.HMACSHA256)
             {
-                hmac = HMACSHA256.Create();
+                hmac = new HMACSHA256(key);
             }
             else if (tipo == TipoHMACHash.HMACSHA384)
             {
-                hmac = HMACSHA384.Create();
+                hmac = new HMACSHA384(key);
             }
             else if (tipo == TipoHMACHash.HMACSHA512)
             {
-                hmac = HMACSHA512.Create();
+                hmac = new HMACSHA512(key);
             }
             else
             {
@@ -173,6 +170,90 @@ namespace HashFilesMA.FileHelpers
             return hmac;
 
         }
-        
+
+        public override HmacValue[] CalcularMultipleHash(TipoHMACHash[] tipos, string ruta, string key)
+        {
+            return CalcularMultipleHash(tipos, ruta, key, null);
+        }
+
+        public override HmacValue[] CalcularMultipleHash(TipoHMACHash[] tipos, string ruta, string key, CancellationToken? token)
+        {
+            try
+            {
+                //Los hashesh tendran la misma longitud los tipos de hash a calcular
+                HmacValue[] hashes = new HmacValue[tipos.Length];
+                //Obtenemos todos los algoritmos hmac a utilizar
+                HMAC[] algoritmos = tipos.Select(tipo => ObtieneClaseHmac(tipo, Encoding.Default.GetBytes(key))).ToArray();
+
+                //Abrimos el archivos en modo lectura 
+                using (FileStream fs = new FileStream(ruta, FileMode.Open, FileAccess.Read))
+                {
+                    //Obtenemos el tamaño del archivo
+                    long tamanioArchivo = fs.Length;
+                    long contadorLeidos = 0;
+
+                    byte[] buffer = new byte[lengthBuffer];
+                    int leidos;
+
+                    //Leeamos en bloques
+                    while ((leidos = fs.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        //Si se solicita la concelacion de la operacion la realizamos
+                        if (token.HasValue && token.Value.IsCancellationRequested)
+                        {
+                           
+                            throw new OperationCanceledException();
+                        }
+
+                        contadorLeidos += leidos;
+
+                        //Recorremos cada algoritmo
+                        foreach (HMAC algoritmo in algoritmos)
+                        {
+                
+                            //Calculalamos el bloque en el algoritmo actual
+                            algoritmo.TransformBlock(buffer, 0, leidos, null, 0);
+                        }
+
+                        //Invocamos el evento de progreso pasando los bytes leidos
+                        //El total de bytes
+                        OnProgreso(new ProgressHashFileArgs()
+                        {
+                            Bytes = contadorLeidos,
+                            TotalBytes = tamanioArchivo,
+                            Progreso = contadorLeidos / (float)tamanioArchivo // Progreso 0.0 - 1.0
+                        });
+                    }
+                    //Finalmente recorremos de  
+                    for (int i = 0; i < algoritmos.Length; i++)
+                    {
+                        algoritmos[i].TransformFinalBlock(buffer, 0, 0);
+
+                        hashes[i] = new HmacValue()
+                        {
+                            Hash = algoritmos[i].Hash,
+                            TipoHash = tipos[i],
+                            HashHex = BytesConverter.ConvertBytesToHex(algoritmos[i].Hash)
+                        };
+
+                        algoritmos[i].Dispose();
+                    }
+
+                    OnProgresoCompletado(EventArgs.Empty);
+
+
+                    return hashes;
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                OnError(new ErrorHashFileArgs { Mensaje = ex.Message });
+
+                return new HmacValue[0];
+            }
+        }
     }
 }

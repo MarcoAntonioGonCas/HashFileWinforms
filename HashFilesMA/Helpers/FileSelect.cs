@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace HashFilesMA.Helpers
 {
@@ -48,7 +49,8 @@ namespace HashFilesMA.Helpers
                 if (RutaArchivo == string.Empty) return "";
                 try
                 {
-                    return Path.GetFileName(RutaArchivo);
+                    string nombre = Path.GetFileName(RutaArchivo);
+                    return nombre;
                 }catch
                 {
                     return "";

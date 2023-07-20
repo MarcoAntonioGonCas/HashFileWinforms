@@ -1,4 +1,5 @@
-﻿using HashFilesMA.Helpers;
+﻿using HashFilesMA.FileHelpers;
+using HashFilesMA.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
@@ -10,20 +11,15 @@ namespace PruebasHash
         [TestMethod]
         public void TestMethod1()
         {
-            byte[] data = { 0b11111111, 0b11111111, 0b11111111 };
-
-            int num = 16;
-
-            string b1 = BytesConverter.IntToBitsEnd(num);
-            string b2 = BytesConverter.IntToBitsEndEvil(num);
-            string b3 = BytesConverter.IntToBitsStart(num);
-            string b4 = BytesConverter.IntToBitsStartEvil(num);
+            string ruta = "C:\\Users\\Marco\\Pictures\\curso-node-restserver-4.0.0.zip";
 
 
-            Assert.AreEqual(b1, "00010000".PadLeft(32, '0'));
-            Assert.AreEqual(b2, "00010000".PadLeft(32, '0'));
-            Assert.AreEqual(b3, "00010000".PadLeft(32, '0'));
-            Assert.AreEqual(b4, "00010000".PadLeft(32, '0'));
+            FileHashCalculator caluladoraHash = new FileHashCalculator();
+            FileHmacHashCalculator hmacHashCalculator = new FileHmacHashCalculator();
+
+
+            Assert.AreEqual("6C2D78388D4100710125AD00ABF75555", hmacHashCalculator.CalcularHashAll(TipoHMACHash.HMACMD5, ruta,"patito12345"));
+
         }
 
         [TestMethod]
