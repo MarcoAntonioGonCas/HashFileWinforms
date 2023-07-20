@@ -47,10 +47,10 @@ namespace HashFilesMA.Forms
         }
         public void LLenaTextbox(HmacValue[] hashesCalulados)
         {
-            string unidos = "";
+           
             foreach (HmacValue hashValue in hashesCalulados)
             {
-                unidos += hashValue.TipoHash.ToString()+ " " + hashValue.Hash.Length.ToString()+" ";
+                
                 if (hashValue.TipoHash == TipoHMACHash.HMACMD5)
                 {
                     txtMD5.Text = hashValue.HashHex;
@@ -74,7 +74,7 @@ namespace HashFilesMA.Forms
 
             }
 
-            MessageBox.Show(unidos);
+
         }
     }
 }
