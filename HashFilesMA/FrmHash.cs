@@ -75,12 +75,10 @@ namespace HashFilesMA
         //Eventos calculadora hash
         private void _calculadoraHash_Error(object sender, ErrorHashFileArgs e)
         {
-            _cancelarProcesoHash.Dispose();
-            _cancelarProcesoHash = new CancellationTokenSource();
+            
             MessageBox.Show("Ha ocurrido un error mientras se calculaba el hash o el procreso fue cancelado" + e.Mensaje);
             Reset();
-            //Desabilita el boton de cancelar
-            btnCancelar.Enabled = false;
+            
             
         }
         private void _calculadoraHash_ProgresoCompletado(object sender, EventArgs e)
@@ -109,49 +107,85 @@ namespace HashFilesMA
         }
 
         //Helpers
+        /// <summary>
+        /// Limpia los controles para volver a calcular
+        /// un nuevo hash.
+        /// </summary>
         private void Reset()
         {
-            
+            _cancelarProcesoHash.Dispose();
+            _cancelarProcesoHash = new CancellationTokenSource();
+
+            btnCancelar.Enabled = false;
             _archivoSeleccionado.Clear();
             prgFileHash.Value = 0;
+
+        }
+        private void LimpiaControlesDeUsuario()
+        {
+            this.fileHashSelectorControl1.LimpiaCampos();
+            this.fileHmacSelectorControl1.LimpiaCampos();
             
         }
 
 
-
         void ProcesarArchivo(string ruta)
         {
-            //Reset();
-            this.fileHashSelectorControl1.LimpiaCampos();
-            this.fileHmacSelectorControl1.LimpiaCampos();
+            LimpiaControlesDeUsuario();
+            txtInput.Clear();
             btnCancelar.Enabled = true;
-            tiposHashCalcular = fileHashSelectorControl1.ObtieneTiposSeleccionados();
-            tiposHmac = fileHmacSelectorControl1.ObtieneTiposSeleccionados();
+            prgFileHash.Value = 0;
 
 
-                
-            
 
-            if(tipoSeleccionado == TipoSeleccionado.Hash)
+
+            if (tipoSeleccionado == TipoSeleccionado.Hash)
             {
-                HashValue[] hashValues = this._calculadoraHash.CalcularMultipleHash(tiposHashCalcular, ruta, _cancelarProcesoHash.Token);
+                tiposHashCalcular = fileHashSelectorControl1.ObtieneTiposSeleccionados();
+                HashValue[] hashValues = this._calculadoraHash.CalcularMultipleHashFile(tiposHashCalcular, ruta, _cancelarProcesoHash.Token);
                 fileHashSelectorControl1.LLenaTextbox(hashValues);
+
             }
-            else
+            else if(tipoSeleccionado == TipoSeleccionado.Hmac )
             {
                 if (!FrmClave.EsClaveValida)
                 {
                     MessageBox.Show("No es una clave valida");
                     return;
                 }
+
+                tiposHmac = fileHmacSelectorControl1.ObtieneTiposSeleccionados();
                 string key = FrmClave.ObtenerClave();
-                HmacValue[] hmacValues = this._calculadoraHmac.CalcularMultipleHash(tiposHmac, ruta, key, _cancelarProcesoHash.Token);
+                HmacValue[] hmacValues = this._calculadoraHmac.CalcularMultipleHashFile(tiposHmac, ruta, key, _cancelarProcesoHash.Token);
                 this.fileHmacSelectorControl1.LLenaTextbox(hmacValues);
 
             }
 
         }
+        void ProcesaTexto(string texto)
+        {
+            if (tipoSeleccionado == TipoSeleccionado.Hash)
+            {
+                tiposHashCalcular = fileHashSelectorControl1.ObtieneTiposSeleccionados();
+                HashValue[] hashValues = this._calculadoraHash.CalcularMultipleHashText(tiposHashCalcular, texto);
+                fileHashSelectorControl1.LLenaTextbox(hashValues);
 
+            }
+            else if (tipoSeleccionado == TipoSeleccionado.Hmac)
+            {
+                if (!FrmClave.EsClaveValida)
+                {
+                    MessageBox.Show("No es una clave valida");
+                    return;
+                }
+
+                tiposHmac = fileHmacSelectorControl1.ObtieneTiposSeleccionados();
+                string key = FrmClave.ObtenerClave();
+                HmacValue[] hmacValues = this._calculadoraHmac.CalcularMultipleHashText(tiposHmac, texto,key);
+                this.fileHmacSelectorControl1.LLenaTextbox(hmacValues);
+
+            }
+        }
 
         
 
@@ -260,6 +294,24 @@ namespace HashFilesMA
             {
                 this.tipoSeleccionado = TipoSeleccionado.Hmac;
             }
+        }
+
+        private void txtInput_TextChanged(object sender, EventArgs e)
+        {
+            string input = txtInput.Text.Trim();
+            if (input == ""){
+                LimpiaControlesDeUsuario();
+                return;
+            }
+
+            Reset();
+            LimpiaControlesDeUsuario();
+            ProcesaTexto(input);
+        }
+
+        private void fileHashSelectorControl1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

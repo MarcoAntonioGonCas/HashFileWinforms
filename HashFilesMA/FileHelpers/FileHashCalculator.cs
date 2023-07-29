@@ -34,7 +34,7 @@ namespace HashFilesMA.FileHelpers
             this.lengthBuffer = 16777216;
         }
 
-        private HashAlgorithm ObtieneHash(TipoHash tipo)
+        private HashAlgorithm ObtieneClaseHash(TipoHash tipo)
         {
             HashAlgorithm hash = null;
             if (tipo == TipoHash.MD5)
@@ -74,7 +74,7 @@ namespace HashFilesMA.FileHelpers
             }
 
             _enProgreso = true;
-            using (HashAlgorithm algoritmo = ObtieneHash(tipo))
+            using (HashAlgorithm algoritmo = ObtieneClaseHash(tipo))
             using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
                 long tamanioArchivo = fs.Length;
@@ -120,12 +120,12 @@ namespace HashFilesMA.FileHelpers
             }
         }
 
-        public override string CalcularHashAll(TipoHash tipo, string ruta)
+        public override string CalcularHashFile(TipoHash tipo, string ruta)
         {
-            return CalcularHashAll(tipo, ruta, null);
+            return CalcularHashFile(tipo, ruta, null);
 
         }
-        public override string CalcularHashAll(TipoHash tipo, string ruta, CancellationToken? token)
+        public override string CalcularHashFile(TipoHash tipo, string ruta, CancellationToken? token)
         {
             try
             {
@@ -149,7 +149,7 @@ namespace HashFilesMA.FileHelpers
         {
             try
             {
-                using(HashAlgorithm hash = ObtieneHash(tipo))
+                using(HashAlgorithm hash = ObtieneClaseHash(tipo))
                 {
                     
                     byte[] bytesText = Encoding.Default.GetBytes(text);
@@ -180,19 +180,19 @@ namespace HashFilesMA.FileHelpers
 
 
         //Calular multiples hash
-        public override HashValue[] CalcularMultipleHash(TipoHash[] tipos, string ruta)
+        public override HashValue[] CalcularMultipleHashFile(TipoHash[] tipos, string ruta)
         {
-           return CalcularMultipleHash(tipos, ruta, null);
+           return CalcularMultipleHashFile(tipos, ruta, null);
         }
 
-        public override HashValue[] CalcularMultipleHash(TipoHash[] tipos, string ruta, CancellationToken? token)
+        public override HashValue[] CalcularMultipleHashFile(TipoHash[] tipos, string ruta, CancellationToken? token)
         {
             try
             {
                 //Los hashesh tendran la misma longitud los tipos de hash a calcular
                 HashValue[] hashes = new HashValue[tipos.Length];  
                 //Obtenemos todos los algoritmos hash a utilizar
-                HashAlgorithm[] algoritmos = tipos.Select( tipo => ObtieneHash(tipo) ).ToArray();
+                HashAlgorithm[] algoritmos = tipos.Select( tipo => ObtieneClaseHash(tipo) ).ToArray();
 
 
                 //Abrimos el archivos en modo lectura 
@@ -269,8 +269,51 @@ namespace HashFilesMA.FileHelpers
             }
         }
 
+        public override HashValue[] CalcularMultipleHashText(TipoHash[] tipos, string text)
+        {
+            try
+            {
+                int len = tipos.Length;
+                HashValue[] hashes = new HashValue[len];
+                HashAlgorithm[] algoritmos = new HashAlgorithm[len];
 
+                for (int i = 0; i < len; i++)
+                {
+                    algoritmos[i] = ObtieneClaseHash(tipos[i]);
+                }
 
+                for (int i = 0; i < len; i++)
+                {
+                    HashAlgorithm clase = algoritmos[i];
+                    byte[] hash = clase.ComputeHash(Encoding.Default.GetBytes(text));
 
+                    hashes[i] = new HashValue()
+                    {
+                        Hash = hash,
+                        TipoHash = tipos[i],
+                        HashHex = BytesConverter.ConvertBytesToHex(hash)
+                    };
+                }
+
+                OnProgreso(new ProgressHashFileArgs()
+                {
+                    Bytes = 1,
+                    Progreso = 1,
+                    TotalBytes = 1,
+                });
+                //OnProgresoCompletado(EventArgs.Empty);
+                return hashes;
+
+            }
+            catch (Exception ex)
+            {
+
+                OnError(new ErrorHashFileArgs
+                {
+                    Mensaje = ex.Message
+                });
+                return new HashValue[0];
+            }
+        }
     }
 }

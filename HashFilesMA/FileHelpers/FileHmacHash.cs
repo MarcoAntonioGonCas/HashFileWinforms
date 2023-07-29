@@ -27,9 +27,11 @@ namespace HashFilesMA.FileHelpers
         protected long lengthBuffer { get; set; }
 
         public abstract string CalcularHashText(TipoHMACHash tipo, string text,string key);
-        public abstract string CalcularHashAll(TipoHMACHash tipo, string ruta, string key, CancellationToken? token);
-        public abstract string CalcularHashAll(TipoHMACHash tipo, string ruta, string key);
-        public abstract HmacValue[] CalcularMultipleHash(TipoHMACHash[] tipos, string ruta, string key);
-        public abstract HmacValue[] CalcularMultipleHash(TipoHMACHash[] tipos, string ruta, string key, CancellationToken? token);
+        public abstract HmacValue[] CalcularMultipleHashText(TipoHMACHash[] tipos, string text,string key);
+        public abstract string CalcularHashFile(TipoHMACHash tipo, string ruta, string key, CancellationToken? token);
+        public abstract string CalcularHashFile(TipoHMACHash tipo, string ruta, string key);
+        public abstract HmacValue[] CalcularMultipleHashFile(TipoHMACHash[] tipos, string ruta, string key);
+        public abstract HmacValue[] CalcularMultipleHashFile(TipoHMACHash[] tipos, string ruta, string key, CancellationToken? token);
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using HashFilesMA.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Security.Authentication;
@@ -22,13 +23,13 @@ namespace HashFilesMA.FileHelpers
         //Helpers
         private string CalculaHashHex(TipoHMACHash tipo, string ruta, string key, CancellationToken? token)
         {
-            byte[] bytesHash = CalcularHashAllAux(tipo, ruta, key, token);
+            byte[] bytesHash = CalcularHashFileAux(tipo, ruta, key, token);
             string hexHash = BytesConverter.ConvertBytesToHex(bytesHash);
 
             return hexHash;
 
         }
-        private byte[] CalcularHashAllAux(TipoHMACHash tipo, string ruta, string key, CancellationToken? token)
+        private byte[] CalcularHashFileAux(TipoHMACHash tipo, string ruta, string key, CancellationToken? token)
         {
             if(!File.Exists(ruta)) {
                 throw new FileNotFoundException(ruta);
@@ -86,7 +87,7 @@ namespace HashFilesMA.FileHelpers
 
         //Methods
 
-        public override string CalcularHashAll(TipoHMACHash tipo, string ruta, string key, CancellationToken? token)
+        public override string CalcularHashFile(TipoHMACHash tipo, string ruta, string key, CancellationToken? token)
         {
             try
             {
@@ -101,7 +102,7 @@ namespace HashFilesMA.FileHelpers
             }
         }
 
-        public override string CalcularHashAll(TipoHMACHash tipo, string ruta, string key)
+        public override string CalcularHashFile(TipoHMACHash tipo, string ruta, string key)
         {
             return CalculaHashHex(tipo,ruta, key, null);
         }
@@ -171,12 +172,12 @@ namespace HashFilesMA.FileHelpers
 
         }
 
-        public override HmacValue[] CalcularMultipleHash(TipoHMACHash[] tipos, string ruta, string key)
+        public override HmacValue[] CalcularMultipleHashFile(TipoHMACHash[] tipos, string ruta, string key)
         {
-            return CalcularMultipleHash(tipos, ruta, key, null);
+            return CalcularMultipleHashFile(tipos, ruta, key, null);
         }
 
-        public override HmacValue[] CalcularMultipleHash(TipoHMACHash[] tipos, string ruta, string key, CancellationToken? token)
+        public override HmacValue[] CalcularMultipleHashFile(TipoHMACHash[] tipos, string ruta, string key, CancellationToken? token)
         {
             try
             {
@@ -253,6 +254,53 @@ namespace HashFilesMA.FileHelpers
                 OnError(new ErrorHashFileArgs { Mensaje = ex.Message });
 
                 return new HmacValue[0];
+            }
+        }
+
+        public override HmacValue[] CalcularMultipleHashText(TipoHMACHash[] tipos, string text, string key)
+        {
+            try
+            {
+                int len = tipos.Length;
+                HmacValue[] hashes = new HmacValue[len];
+                HMAC[] algoritmos = new HMAC[len];
+
+                for (int i = 0; i < len; i++)
+                {
+                    algoritmos[i] = ObtieneClaseHmac(tipos[i],Encoding.Default.GetBytes(key));
+                }
+
+                for (int i = 0; i < len; i++)
+                {
+                    HMAC clase = algoritmos[i];
+                    byte[] hash = clase.ComputeHash(Encoding.Default.GetBytes(text));
+
+                    hashes[i] = new HmacValue()
+                    {
+                        Hash = hash,
+                        TipoHash = tipos[i],
+                        HashHex = BytesConverter.ConvertBytesToHex(hash)
+                    };
+                    clase.Dispose();
+                }
+
+                OnProgreso(new ProgressHashFileArgs()
+                {
+                    Bytes = 1,
+                    Progreso = 1,
+                    TotalBytes = 1,
+                });
+                //OnProgresoCompletado(EventArgs.Empty);
+                return hashes;
+
+            }
+            catch(Exception ex) {
+
+                OnError(new ErrorHashFileArgs
+                {
+                    Mensaje = ex.Message
+                });
+                return new HmacValue[0]; 
             }
         }
     }

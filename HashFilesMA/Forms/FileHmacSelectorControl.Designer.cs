@@ -28,9 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FileHmacSelectorControl));
             this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnSHA512 = new System.Windows.Forms.Button();
+            this.btnSHA384 = new System.Windows.Forms.Button();
+            this.btnSHA256 = new System.Windows.Forms.Button();
+            this.btnSHA1 = new System.Windows.Forms.Button();
+            this.btnMD5 = new System.Windows.Forms.Button();
             this.txtSHA512 = new System.Windows.Forms.TextBox();
             this.txtSHA384 = new System.Windows.Forms.TextBox();
             this.txtSHA256 = new System.Windows.Forms.TextBox();
@@ -43,6 +49,7 @@
             this.txtMD5 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.btnClave = new HashFilesMA.Controles.ButtonCustom();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -64,6 +71,11 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btnSHA512);
+            this.panel1.Controls.Add(this.btnSHA384);
+            this.panel1.Controls.Add(this.btnSHA256);
+            this.panel1.Controls.Add(this.btnSHA1);
+            this.panel1.Controls.Add(this.btnMD5);
             this.panel1.Controls.Add(this.txtSHA512);
             this.panel1.Controls.Add(this.txtSHA384);
             this.panel1.Controls.Add(this.txtSHA256);
@@ -76,37 +88,106 @@
             this.panel1.Controls.Add(this.txtMD5);
             this.panel1.Controls.Add(this.checkedListBox1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 42);
+            this.panel1.Location = new System.Drawing.Point(0, 40);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(607, 170);
+            this.panel1.Size = new System.Drawing.Size(709, 170);
             this.panel1.TabIndex = 5;
+            // 
+            // btnSHA512
+            // 
+            this.btnSHA512.FlatAppearance.BorderSize = 0;
+            this.btnSHA512.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.btnSHA512.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSHA512.Image = ((System.Drawing.Image)(resources.GetObject("btnSHA512.Image")));
+            this.btnSHA512.Location = new System.Drawing.Point(588, 131);
+            this.btnSHA512.Name = "btnSHA512";
+            this.btnSHA512.Size = new System.Drawing.Size(24, 27);
+            this.btnSHA512.TabIndex = 21;
+            this.btnSHA512.UseVisualStyleBackColor = true;
+            this.btnSHA512.Click += new System.EventHandler(this.btnMD5_Click);
+            // 
+            // btnSHA384
+            // 
+            this.btnSHA384.FlatAppearance.BorderSize = 0;
+            this.btnSHA384.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.btnSHA384.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSHA384.Image = ((System.Drawing.Image)(resources.GetObject("btnSHA384.Image")));
+            this.btnSHA384.Location = new System.Drawing.Point(588, 101);
+            this.btnSHA384.Name = "btnSHA384";
+            this.btnSHA384.Size = new System.Drawing.Size(24, 27);
+            this.btnSHA384.TabIndex = 20;
+            this.btnSHA384.UseVisualStyleBackColor = true;
+            this.btnSHA384.Click += new System.EventHandler(this.btnMD5_Click);
+            // 
+            // btnSHA256
+            // 
+            this.btnSHA256.FlatAppearance.BorderSize = 0;
+            this.btnSHA256.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.btnSHA256.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSHA256.Image = ((System.Drawing.Image)(resources.GetObject("btnSHA256.Image")));
+            this.btnSHA256.Location = new System.Drawing.Point(588, 66);
+            this.btnSHA256.Name = "btnSHA256";
+            this.btnSHA256.Size = new System.Drawing.Size(24, 27);
+            this.btnSHA256.TabIndex = 19;
+            this.btnSHA256.UseVisualStyleBackColor = true;
+            this.btnSHA256.Click += new System.EventHandler(this.btnMD5_Click);
+            // 
+            // btnSHA1
+            // 
+            this.btnSHA1.FlatAppearance.BorderSize = 0;
+            this.btnSHA1.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.btnSHA1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSHA1.Image = ((System.Drawing.Image)(resources.GetObject("btnSHA1.Image")));
+            this.btnSHA1.Location = new System.Drawing.Point(588, 34);
+            this.btnSHA1.Name = "btnSHA1";
+            this.btnSHA1.Size = new System.Drawing.Size(24, 27);
+            this.btnSHA1.TabIndex = 18;
+            this.btnSHA1.UseVisualStyleBackColor = true;
+            this.btnSHA1.Click += new System.EventHandler(this.btnMD5_Click);
+            // 
+            // btnMD5
+            // 
+            this.btnMD5.FlatAppearance.BorderSize = 0;
+            this.btnMD5.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.btnMD5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMD5.Image = ((System.Drawing.Image)(resources.GetObject("btnMD5.Image")));
+            this.btnMD5.Location = new System.Drawing.Point(588, 2);
+            this.btnMD5.Name = "btnMD5";
+            this.btnMD5.Size = new System.Drawing.Size(24, 27);
+            this.btnMD5.TabIndex = 17;
+            this.btnMD5.UseVisualStyleBackColor = true;
+            this.btnMD5.Click += new System.EventHandler(this.btnMD5_Click);
             // 
             // txtSHA512
             // 
             this.txtSHA512.Location = new System.Drawing.Point(261, 135);
             this.txtSHA512.Name = "txtSHA512";
-            this.txtSHA512.Size = new System.Drawing.Size(216, 20);
+            this.txtSHA512.ReadOnly = true;
+            this.txtSHA512.Size = new System.Drawing.Size(321, 20);
             this.txtSHA512.TabIndex = 11;
             // 
             // txtSHA384
             // 
             this.txtSHA384.Location = new System.Drawing.Point(261, 105);
             this.txtSHA384.Name = "txtSHA384";
-            this.txtSHA384.Size = new System.Drawing.Size(216, 20);
+            this.txtSHA384.ReadOnly = true;
+            this.txtSHA384.Size = new System.Drawing.Size(321, 20);
             this.txtSHA384.TabIndex = 10;
             // 
             // txtSHA256
             // 
             this.txtSHA256.Location = new System.Drawing.Point(261, 70);
             this.txtSHA256.Name = "txtSHA256";
-            this.txtSHA256.Size = new System.Drawing.Size(216, 20);
+            this.txtSHA256.ReadOnly = true;
+            this.txtSHA256.Size = new System.Drawing.Size(321, 20);
             this.txtSHA256.TabIndex = 9;
             // 
             // txtSHA1
             // 
             this.txtSHA1.Location = new System.Drawing.Point(261, 38);
             this.txtSHA1.Name = "txtSHA1";
-            this.txtSHA1.Size = new System.Drawing.Size(216, 20);
+            this.txtSHA1.ReadOnly = true;
+            this.txtSHA1.Size = new System.Drawing.Size(321, 20);
             this.txtSHA1.TabIndex = 8;
             // 
             // label6
@@ -163,7 +244,8 @@
             // 
             this.txtMD5.Location = new System.Drawing.Point(261, 3);
             this.txtMD5.Name = "txtMD5";
-            this.txtMD5.Size = new System.Drawing.Size(216, 20);
+            this.txtMD5.ReadOnly = true;
+            this.txtMD5.Size = new System.Drawing.Size(321, 20);
             this.txtMD5.TabIndex = 1;
             // 
             // label1
@@ -186,6 +268,10 @@
             this.label7.TabIndex = 17;
             this.label7.Text = "Clave:";
             // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // btnClave
             // 
             this.btnClave.BorderColor = System.Drawing.Color.Crimson;
@@ -198,7 +284,7 @@
             this.btnClave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClave.GradientBorder = true;
             this.btnClave.GradientBorderAngle = 45;
-            this.btnClave.Image = ((System.Drawing.Image)(resources.GetObject("btnClave.Image")));
+            this.btnClave.Image = global::HashFilesMA.Properties.Resources.llave;
             this.btnClave.Location = new System.Drawing.Point(297, 6);
             this.btnClave.Name = "btnClave";
             this.btnClave.Size = new System.Drawing.Size(42, 30);
@@ -215,7 +301,7 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.label1);
             this.Name = "FileHmacSelectorControl";
-            this.Size = new System.Drawing.Size(607, 212);
+            this.Size = new System.Drawing.Size(709, 210);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);
@@ -240,5 +326,11 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label7;
         private Controles.ButtonCustom btnClave;
+        private System.Windows.Forms.Button btnSHA512;
+        private System.Windows.Forms.Button btnSHA384;
+        private System.Windows.Forms.Button btnSHA256;
+        private System.Windows.Forms.Button btnSHA1;
+        private System.Windows.Forms.Button btnMD5;
+        private System.Windows.Forms.Timer timer1;
     }
 }

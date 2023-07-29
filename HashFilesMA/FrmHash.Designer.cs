@@ -49,6 +49,8 @@
             this.fileHmacSelectorControl1 = new HashFilesMA.Forms.FileHmacSelectorControl();
             this.btnOpenFile = new HashFilesMA.Controles.ButtonCustom();
             this.lblProgreso = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.txtInput = new System.Windows.Forms.TextBox();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -178,10 +180,10 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(12, 155);
+            this.tabControl1.Location = new System.Drawing.Point(12, 212);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(872, 313);
+            this.tabControl1.Size = new System.Drawing.Size(872, 256);
             this.tabControl1.TabIndex = 9;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
@@ -191,17 +193,18 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(864, 287);
+            this.tabPage1.Size = new System.Drawing.Size(864, 230);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Hash";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // fileHashSelectorControl1
             // 
-            this.fileHashSelectorControl1.Location = new System.Drawing.Point(127, 30);
+            this.fileHashSelectorControl1.Location = new System.Drawing.Point(113, 6);
             this.fileHashSelectorControl1.Name = "fileHashSelectorControl1";
-            this.fileHashSelectorControl1.Size = new System.Drawing.Size(552, 221);
+            this.fileHashSelectorControl1.Size = new System.Drawing.Size(647, 221);
             this.fileHashSelectorControl1.TabIndex = 0;
+            this.fileHashSelectorControl1.Load += new System.EventHandler(this.fileHashSelectorControl1_Load);
             // 
             // tabPage2
             // 
@@ -209,16 +212,16 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(864, 287);
+            this.tabPage2.Size = new System.Drawing.Size(864, 230);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "HMAC";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // fileHmacSelectorControl1
             // 
-            this.fileHmacSelectorControl1.Location = new System.Drawing.Point(173, 39);
+            this.fileHmacSelectorControl1.Location = new System.Drawing.Point(126, 3);
             this.fileHmacSelectorControl1.Name = "fileHmacSelectorControl1";
-            this.fileHmacSelectorControl1.Size = new System.Drawing.Size(547, 208);
+            this.fileHmacSelectorControl1.Size = new System.Drawing.Size(615, 208);
             this.fileHmacSelectorControl1.TabIndex = 0;
             // 
             // btnOpenFile
@@ -235,7 +238,7 @@
             this.btnOpenFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnOpenFile.GradientBorder = true;
             this.btnOpenFile.GradientBorderAngle = 45;
-            this.btnOpenFile.Location = new System.Drawing.Point(277, 30);
+            this.btnOpenFile.Location = new System.Drawing.Point(255, 39);
             this.btnOpenFile.Name = "btnOpenFile";
             this.btnOpenFile.Size = new System.Drawing.Size(343, 119);
             this.btnOpenFile.TabIndex = 0;
@@ -258,11 +261,31 @@
             this.lblProgreso.TabIndex = 7;
             this.lblProgreso.Text = "0%";
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(13, 175);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(256, 18);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "Ingrese el texto para convetir en hash:";
+            // 
+            // txtInput
+            // 
+            this.txtInput.Location = new System.Drawing.Point(275, 175);
+            this.txtInput.Name = "txtInput";
+            this.txtInput.Size = new System.Drawing.Size(536, 20);
+            this.txtInput.TabIndex = 10;
+            this.txtInput.TextChanged += new System.EventHandler(this.txtInput_TextChanged);
+            // 
             // FrmHash
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(896, 631);
+            this.Controls.Add(this.txtInput);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.btnCancelar);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.btnComparar);
@@ -309,6 +332,8 @@
         private System.Windows.Forms.Label lblProgreso;
         private Forms.FileHashSelectorControl fileHashSelectorControl1;
         private Forms.FileHmacSelectorControl fileHmacSelectorControl1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox txtInput;
     }
 }
 

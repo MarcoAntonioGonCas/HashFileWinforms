@@ -14,12 +14,22 @@ namespace HashFilesMA.Forms
 {
     public partial class FileHmacSelectorControl : UserControl
     {
+        private Button btnSeleccionado = null;
         public FileHmacSelectorControl()
         {
             InitializeComponent();
             SeleccionarTodos(checkedListBox1);
+            VinculaBotones();
         }
 
+        private void VinculaBotones()
+        {
+            btnMD5.Tag = txtMD5;
+            btnSHA1.Tag = txtSHA1;  
+            btnSHA256.Tag = txtSHA256;
+            btnSHA384.Tag = txtSHA384;
+            btnSHA512.Tag = txtSHA512;
+        }
         private void btnClave_Click(object sender, EventArgs e)
         {
             new FrmClave().ShowDialog();
@@ -34,7 +44,7 @@ namespace HashFilesMA.Forms
 
         public TipoHMACHash[] ObtieneTiposSeleccionados()
         {
-            return ComboHelper.ObtenerHashSeleccionados<TipoHMACHash>(checkedListBox1);
+            return ComboHelper.ObterEnumsSeleccionados<TipoHMACHash>(checkedListBox1);
         }
 
         public void LimpiaCampos()
@@ -74,6 +84,57 @@ namespace HashFilesMA.Forms
 
             }
 
+
+        }
+
+
+        /// <summary>
+        /// Copia el contenido del textbox al portapapeles y cambia el icono del botton seleccionado.
+        /// </summary>
+        /// <param name="txt">Textbox del cual obtendremos el texto a copiar.</param>
+        /// <param name="button">Button el cual fue presionado.</param>
+        private void CopiarHashPortapapeles(TextBox txt, Button button)
+        {
+            string hashTextbox = "";
+
+            hashTextbox = txt.Text;
+            if (hashTextbox == "") return;
+
+            // Copia el texto del texbox al portapeles
+            Clipboard.SetText(hashTextbox);
+
+            // Si se preciono un boton anteriormente se le devuelve la imagen original
+            if (btnSeleccionado != null)
+            {
+                this.btnSeleccionado.Image = global::HashFilesMA.Properties.Resources.copiar16;
+            }
+
+            // Se cambia la imagen indicando que se copio al portapapeles correctamente
+            button.Image = global::HashFilesMA.Properties.Resources.copiado;
+            this.btnSeleccionado = button;
+
+            //Iniciamos nuestro timer para regresar la imagen original al boton presionado
+            timer1.Interval = 1000;
+            timer1.Start();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+
+            timer1.Stop();
+            //Regresamos la imagen original al boton presionado al momento de copiar al portapapeles
+            this.btnSeleccionado.Image = global::HashFilesMA.Properties.Resources.copiar16;
+        }
+
+        private void btnMD5_Click(object sender, EventArgs e)
+        {
+            if (!(sender is Button)) return;
+            Button btnHash = sender as Button;
+            if (!(btnHash.Tag is TextBox)) return;
+
+            TextBox txtVinculado = btnHash.Tag as TextBox;
+
+            CopiarHashPortapapeles(txtVinculado,btnHash);
 
         }
     }

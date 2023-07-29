@@ -8,12 +8,21 @@ using System.Windows.Forms;
 
 namespace HashFilesMA.Helpers
 {
+    /// <summary>
+    /// Clase la cual indica si un archivo fue seleccionado.
+    /// </summary>
     public class FileSelect
     {
         
-
+        /// <summary>
+        /// Evento el cual es invocado cuando la ruta del archivo
+        /// cambia.
+        /// </summary>
         public event EventHandler CambioArchivo; 
         private string _rutaArchivo;
+        /// <summary>
+        /// Indica si actualmente esta seleccionado un archivo.
+        /// </summary>
         public bool Seleccionado
         {
             get
@@ -21,6 +30,9 @@ namespace HashFilesMA.Helpers
                 return this.RutaArchivo != "";
             }
         }
+        /// <summary>
+        /// Ruta del archivo.
+        /// </summary>
         public string RutaArchivo
         {
             get => _rutaArchivo; 
@@ -42,6 +54,10 @@ namespace HashFilesMA.Helpers
 
             }
         }
+        /// <summary>
+        /// Devuelve solo el nombre del archivo si no esta seleccionado
+        /// ningun archivo devuelve un string vacio.
+        /// </summary>
         public string Nombre
         {
             get
@@ -60,6 +76,9 @@ namespace HashFilesMA.Helpers
 
         }
 
+        /// <summary>
+        /// Quita el archivo seleccionado.
+        /// </summary>
         public void Clear()
         {
             _rutaArchivo = "";

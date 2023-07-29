@@ -27,16 +27,17 @@ namespace HashFilesMA.FileHelpers
         public string HashHex { get; set; }
     }
 
-    //Todo implementarlo 
+
     public abstract class FileHash:FileHashEvents
     {
         protected long lengthBuffer { get; set; }
 
         public abstract string CalcularHashText(TipoHash tipo, string text);
-        public abstract string CalcularHashAll(TipoHash tipo, string ruta, CancellationToken? token);
-        public abstract string CalcularHashAll(TipoHash tipo, string ruta);
+        public abstract string CalcularHashFile(TipoHash tipo, string ruta, CancellationToken? token);
+        public abstract string CalcularHashFile(TipoHash tipo, string ruta);
 
-        public abstract HashValue[] CalcularMultipleHash(TipoHash[] tipos, string ruta);
-        public abstract HashValue[] CalcularMultipleHash(TipoHash[] tipos, string ruta,CancellationToken? token);
+        public abstract HashValue[] CalcularMultipleHashFile(TipoHash[] tipos, string ruta);
+        public abstract HashValue[] CalcularMultipleHashFile(TipoHash[] tipos, string ruta,CancellationToken? token);
+        public abstract HashValue[] CalcularMultipleHashText(TipoHash[] tipos, string text);
     }
 }
